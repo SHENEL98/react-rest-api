@@ -6,12 +6,20 @@ axios.defaults.baseURL = "http://localhost:8000/api/v1/";
 
 const SkillContext = createContext();
 
+//this will usefull to keep empty input text field.
+const initialForm = {
+    name: "",
+    slug: "",
+};
+
 export const SkillProvider = ({ children }) => {
     //const variables from SkillCreate.js 
-    const [formValues, setFormValues] = useState({
-        name: "",
-        slug: "",
-    });
+    // const [formValues, setFormValues] = useState({
+    //     name: "",
+    //     slug: "",
+    // });
+
+    const [formValues, setFormValues] = useState(initialForm);
 
     const onChnage = (e) => {
         const { name, value } = e.target;
@@ -33,28 +41,62 @@ export const SkillProvider = ({ children }) => {
     };
 
     const getSkill = async (id) => {
+        // console.log(id);
         const response = await axios.get("skills/" + id);
-        setSkill(response.data.data);
+        const apiSkill = response.data.data;
+        setSkill(apiSkill);
+        setFormValues({
+            name: apiSkill.name,
+            slug: apiSkill.slug,
+        });
     };
 
+    //store
     const storeSkill = async (e) => {
         e.preventDefault();
         try {
-          await axios.post("skills", formValues);
-        //   setFormValues(initialForm);
-          navigate("/skills");
+            await axios.post("skills", formValues);
+            // getSkills();
+            setFormValues(initialForm);
+            navigate("/skills");
         } catch (e) {
-          if (e.response.status === 422) {
-            setErrors(e.response.data.errors);
-          }
+            if (e.response.status === 422) {
+                setErrors(e.response.data.errors);
+            }
         }
+    };
+
+    //update
+    const updateSkill = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.put("skills/" + skill.id, formValues);
+            // getSkills();
+            setFormValues(initialForm);
+
+            navigate("/skills");
+
+        } catch (e) {
+            if (e.response.status === 422) {
+                setErrors(e.response.data.errors);
+            }
+        }
+    };
+
+    //delete
+    const deleteSkill = async (id) => {
+        if (!window.confirm("Do you want to delete this ?")) {
+          return;
+        }
+        await axios.delete("skills/" + id);
+        getSkills();
       };
 
-
-
-    return <SkillContext.Provider 
-    value={{ skill, skills, getSkill, getSkills, onChnage, formValues, storeSkill, errors,
-        setErrors, }}>{children}</SkillContext.Provider>
+    return <SkillContext.Provider
+        value={{
+            skill, skills, getSkill, getSkills, onChnage, formValues, storeSkill, errors,
+            setErrors, updateSkill, deleteSkill
+        }}>{children}</SkillContext.Provider>
 }
 
 export default SkillContext;

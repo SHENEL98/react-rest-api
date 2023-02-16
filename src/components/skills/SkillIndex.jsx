@@ -1,14 +1,14 @@
-import { useEffect, useContext} from "react";
-import { Link } from "react-router-dom"; 
+import { useEffect, useContext } from "react";
+import { Link } from "react-router-dom";
 import React from 'react';
 import SkillContext from "../../Context/SkillContext";
 
 export const SkillIndex = () => {
-    const { skills, getSkills} = useContext(SkillContext);
+    const { skills, getSkills, deleteSkill } = useContext(SkillContext);
     //passed const variables to SkillContext.js
     useEffect(() => {
-    //passed const variables to SkillContext.js
-       
+        //passed const variables to SkillContext.js
+
         getSkills();
     }, []);
 
@@ -42,7 +42,20 @@ export const SkillIndex = () => {
                                 <tr key={skill.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                     <td className="px-6 py-4">{skill.name}</td>
                                     <td className="px-6 py-4">{skill.slug}</td>
-                                    <td className="px-6 py-4">Edit / Delete</td>
+                                    <td className="px-6 py-4">
+                                        <Link
+                                            to={`/skills/${skill.id}/edit`}
+                                            className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white rounded-md"
+                                        >
+                                            Edit
+                                        </Link>
+                                        <button
+                                            onClick={() => deleteSkill(skill.id)}
+                                            className="px-4 py-2 bg-red-500 hover:bg-red-700 text-white rounded-md"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
                                 </tr>
                             );
                         })}
